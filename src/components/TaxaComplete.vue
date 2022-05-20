@@ -37,14 +37,14 @@ const searchGenus = (event) => {
       </template>
   </AutoComplete>
 
-  <p>
+
     <div class="field">
       <label for="username1">Username</label>
       <InputText id="username1" type="username" aria-describedby="username1-help" />
       <small id="username1-help">Enter your username to reset your password.</small>
   </div> 
   <pre>{{ selectedGenus }}</pre>
-  </p>
+
   <!-- <pre>{{ genera }}</pre> -->
 </Panel>
 </template>
