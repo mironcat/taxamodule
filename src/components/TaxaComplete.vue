@@ -1,11 +1,10 @@
 <script setup>
 import { ref } from "vue";
 // import GbifService from '../services/GbifService';
-import Dropdown from "primevue/dropdown";
 import AutoComplete from "primevue/autocomplete";
 import InputText from "primevue/inputtext";
 import Panel from "primevue/panel";
-
+import Dropdown from "primevue/dropdown";
 const props = defineProps({
   sourceTaxon: {
     type: Object,
@@ -46,7 +45,7 @@ const searchGenus = (event) => {
 </script>
 
 <template>
-  <Panel header="Taxa">
+  <Panel header="Taxa" width="600">
     <!--  -->
     <div class="p-fluid formgrid grid">
       <div class="field col-12">
@@ -64,10 +63,14 @@ const searchGenus = (event) => {
           <label>GBIF search</label>
         </div>
       </div>
-      <div class="field col-12 md:col-12">
+      <div class="field col-12 md:col-10">
         <label for="phoneext">scientificName</label>
         <InputText type="text" v-model="selectedGenus.scientificName" />
       </div>
+      <div class="field col-12 md:col-2">
+         <label for="phoneext">Rank</label>
+        <Dropdown v-model="selectedGenus.rank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
+      </div>         
       <div class="field col-12 md:col-6">
         <label>Kingdom</label>
         <InputText type="text" v-model="selectedGenus.kingdom" />
@@ -83,10 +86,7 @@ const searchGenus = (event) => {
         <InputText type="text" v-model="selectedGenus.family" />
       </div>
       
-      <div class="field col-12 md:col-6">
-        <label for="Phone">genus</label>
-        <Dropdown v-model="currentTaxon.taxonRank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
-      </div>
+
     </div>
     <pre>{{ selectedGenus }}</pre>
    
@@ -100,7 +100,7 @@ const searchGenus = (event) => {
   }
 }
 .p-fluid {
-  margin-top: 1 rem;
+  margin-top: 1rem;
 }
 .field * {
   display: blcok;
