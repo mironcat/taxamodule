@@ -26,36 +26,53 @@ const searchGenus = (event) => {
 
 <template>
   <Panel header="AutoComplete">
-    <div class="p-fluid grid">
-      <div class="field col-12 md:col-4">
-        <span class="p-float-label">
-          <AutoComplete
-            v-model="selectedGenus"
-            :suggestions="genera"
-            @complete="searchGenus($event)"
-            field="genus"
-          >
-            <template #item="{ item }">
-              <div>{{ item.genus }} ({{ item.kingdom }})</div>
-            </template>
-          </AutoComplete>
-          <label for="inputtext">Genus</label>
-        </span>
+    <div class="p-fluid formgrid grid">
+      <div class="field col-12 md:col-6">
+        <label for="basic">Basic</label>
+        <AutoComplete
+          v-model="selectedGenus"
+          :suggestions="genera"
+          @complete="searchGenus($event)"
+          field="genus"
+        >
+          <template #item="{ item }">
+            <div>{{ item.genus }} ({{ item.kingdom }})</div>
+          </template>
+        </AutoComplete>
       </div>
-      <div class="field col-12 md:col-4">
-        <span class="p-float-label">
-          <InputText id="kingdom" type="text" v-model="kingdom" />
-          <label for="inputtext">Kingdom</label>
-        </span>
+
+      <div class="field col-12 md:col-6">
+        <label for="basic">Basic</label>
+        <InputText type="text" v-model="value" />
+      </div>
+
+      <div class="field col-12 md:col-6">
+        <label for="ssn">SSN</label>
+        <InputText type="text" v-model="value" />
+      </div>
+
+      <div class="field col-12 md:col-6">
+        <label for="date">Date</label>
+        <InputText type="text" v-model="value" />
+      </div>
+
+      <div class="field col-12 md:col-6">
+        <label for="Phone">Phone</label>
+        <InputText type="text" v-model="value" />
+      </div>
+
+      <div class="field col-12 md:col-6">
+        <label for="phoneext">Phone Ext</label>
+        <InputText type="text" v-model="value" />
       </div>
     </div>
-    <!-- <pre>{{ genera }}</pre> -->
+    <pre>{{ selectedGenus }}</pre>
   </Panel>
 </template>
 <style lang="scss" scoped>
 .sizes {
   .p-inputtext {
-    // display: block;
+    display: block;
     margin-bottom: 0.5rem;
 
     &:last-child {
@@ -65,6 +82,6 @@ const searchGenus = (event) => {
 }
 
 .field * {
-  // display: block;
+  display: left;
 }
 </style>
