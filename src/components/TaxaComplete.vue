@@ -39,11 +39,8 @@ const searchGenus = (event) => {
               <div>{{ item.genus }} ({{ item.kingdom }})</div>
             </template>
           </AutoComplete>
-          <label
-            for="name"
-            :class="{ 'p-error': v$.name.$invalid && submitted }"
-            >search in GBIF</label
-          >
+          <label for="basic">Basic</label>
+
         </div>
       </div>
 
