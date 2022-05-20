@@ -1,5 +1,5 @@
 <script setup>
-import { ref  } from 'vue';
+import { ref } from 'vue';
 // import GbifService from '../services/GbifService';
 import AutoComplete from 'primevue/autocomplete';
 import InputText from 'primevue/inputtext';
@@ -25,42 +25,46 @@ const searchGenus = (event) => {
 </script>
 
 <template>
-<Panel header="AutoComplete">
-  <AutoComplete
-    v-model="selectedGenus"
-    :suggestions="genera"
-    @complete="searchGenus($event)"
-    field="genus"
-  >
-        <template #item="{ item }">
-          <div>{{ item.genus }} ({{ item.kingdom }})</div>
-      </template>
-  </AutoComplete>
-
-
-    <div class="field">
-      <label for="username1">Username</label>
-      <InputText id="username1" type="username" aria-describedby="username1-help" />
-      <small id="username1-help">Enter your username to reset your password.</small>
-  </div> 
-  <pre>{{ selectedGenus }}</pre>
-
-  <!-- <pre>{{ genera }}</pre> -->
-</Panel>
+  <Panel header="AutoComplete">
+    <div class="p-fluid grid">
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label">
+          <AutoComplete
+            v-model="selectedGenus"
+            :suggestions="genera"
+            @complete="searchGenus($event)"
+            field="genus"
+          >
+            <template #item="{ item }">
+              <div>{{ item.genus }} ({{ item.kingdom }})</div>
+            </template>
+          </AutoComplete>
+          <label for="inputtext">Genus</label>
+        </span>
+      </div>
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label">
+          <InputText id="kingdom" type="text" v-model="kingdom" />
+          <label for="inputtext">Kingdom</label>
+        </span>
+      </div>
+    </div>
+    <!-- <pre>{{ genera }}</pre> -->
+  </Panel>
 </template>
 <style lang="scss" scoped>
 .sizes {
-    .p-inputtext {
-        display: block;
-        margin-bottom: .5rem;
+  .p-inputtext {
+    // display: block;
+    margin-bottom: 0.5rem;
 
-        &:last-child {
-            margin-bottom: 0;
-        }
+    &:last-child {
+      margin-bottom: 0;
     }
+  }
 }
 
 .field * {
-    display: block;
+  // display: block;
 }
 </style>
