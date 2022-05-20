@@ -39,37 +39,36 @@ const searchGenus = (event) => {
               <div>{{ item.genus }} ({{ item.kingdom }})</div>
             </template>
           </AutoComplete>
-          <label for="basic">Basic</label>
-
+          <label>GBIF search</label>
         </div>
       </div>
 
       <div class="field col-12 md:col-6">
-        <label for="basic">Basic</label>
-        <InputText type="text" v-model="value" />
+        <label>Kingdom</label>
+        <InputText type="text" v-model="selectedGenus.kingdom" />
       </div>
 
       <div class="field col-12 md:col-6">
-        <label for="ssn">SSN</label>
-        <InputText type="text" v-model="value" />
+        <label for="ssn">phylum</label>
+        <InputText type="text" v-model="selectedGenus.phylum" />
       </div>
 
       <div class="field col-12 md:col-6">
-        <label for="date">Date</label>
-        <InputText type="text" v-model="value" />
+        <label for="date">family</label>
+        <InputText type="text" v-model="selectedGenus.family" />
       </div>
 
       <div class="field col-12 md:col-6">
-        <label for="Phone">Phone</label>
-        <InputText type="text" v-model="value" />
+        <label for="Phone">genus</label>
+        <InputText type="text" v-model="selectedGenus.genus" />
       </div>
 
-      <div class="field col-12 md:col-6">
-        <label for="phoneext">Phone Ext</label>
-        <InputText type="text" v-model="value" />
+      <div class="field col-12 md:col-12">
+        <label for="phoneext">scientificName</label>
+        <InputText type="text" v-model="selectedGenus.scientificName" />
       </div>
     </div>
-    <pre>{{ selectedGenus }}</pre>
+    <!-- <pre>{{ selectedGenus }}</pre> -->
   </Panel>
 </template>
 <style lang="scss" scoped>
@@ -77,14 +76,10 @@ const searchGenus = (event) => {
   .p-inputtext {
     display: block;
     margin-bottom: 0.5rem;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
 }
 
 .field * {
-  display: left;
+  display: blcok;
 }
 </style>
