@@ -7,6 +7,7 @@ import Panel from 'primevue/panel';
 const genera = ref();
 // const gbifService = ref(new GbifService());
 const selectedGenus = ref({
+  genus: '',
   kingdom: '',
   phylum: '',
   family: '',
