@@ -5283,3 +5283,4 @@ node_modules/vue/server-renderer/index.mjs
 node_modules/vue/server-renderer/package.json
 .vscode/launch.json
 pnpm-lock.yaml
+node_modules

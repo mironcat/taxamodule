@@ -1,26 +1,42 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 // import GbifService from '../services/GbifService';
-import AutoComplete from 'primevue/autocomplete';
-import InputText from 'primevue/inputtext';
-import Panel from 'primevue/panel';
-const genera = ref();
-// const gbifService = ref(new GbifService());
-const selectedGenus = ref({
-  genus: '',
-  kingdom: '',
-  phylum: '',
-  family: '',
+import Dropdown from "primevue/dropdown";
+import AutoComplete from "primevue/autocomplete";
+import InputText from "primevue/inputtext";
+import Panel from "primevue/panel";
+
+const props = defineProps({
+  sourceTaxon: {
+    type: Object,
+    required: true,
+  },
 });
+const EmptyTaxon = {
+  taxonRank:'',
+  genus: "",
+  kingdom: "",
+  phylum: "",
+  family: "",
+  scientificName: "",  
+};
+const TaxonRanking =ref([
+            {name: 'SPECIES', code: 'SPECIES'},
+            {name: 'GENUS', code: 'GENUS'},
+            {name: 'FAMILY', code: 'FAMILY'},
+            {name: 'ORDER', code: 'ORDER'}
+        ]);
+const taxa = ref();
+// const gbifService = ref(new GbifService());
+const currentTaxon = ref(EmptyTaxon)
+const selectedGenus = ref(EmptyTaxon);
 
 const searchGenus = (event) => {
   setTimeout(() => {
     if (event.query.trim().length) {
-      fetch(
-        `//api.gbif.org/v1/species/suggest?isExtinct=true&rank=genus&q=${event.query.trim()}`
-      )
+      fetch(`//api.gbif.org/v1/species/suggest?q=${event.query.trim()}`)
         .then((res) => res.json())
-        .then((d) => (genera.value = d));
+        .then((d) => (taxa.value = d));
       // gbifService.value
       //   .getGenusNames(event.query.toLowerCase())
       //   .then((data) => (genera.value = data));
@@ -30,24 +46,28 @@ const searchGenus = (event) => {
 </script>
 
 <template>
-  <Panel header="AutoComplete">
+  <Panel header="Taxa">
+    <!--  -->
     <div class="p-fluid formgrid grid">
       <div class="field col-12">
         <div class="p-float-label">
           <AutoComplete
             v-model="selectedGenus"
-            :suggestions="genera"
+            :suggestions="taxa"
             @complete="searchGenus($event)"
-            field="genus"
+            field="scientificName"
           >
             <template #item="{ item }">
-              <div>{{ item.genus }} ({{ item.kingdom }})</div>
+              <div>{{ item.scientificName }} ({{ item.kingdom }})</div>
             </template>
           </AutoComplete>
           <label>GBIF search</label>
         </div>
       </div>
-
+      <div class="field col-12 md:col-12">
+        <label for="phoneext">scientificName</label>
+        <InputText type="text" v-model="selectedGenus.scientificName" />
+      </div>
       <div class="field col-12 md:col-6">
         <label>Kingdom</label>
         <InputText type="text" v-model="selectedGenus.kingdom" />
@@ -62,18 +82,14 @@ const searchGenus = (event) => {
         <label for="date">family</label>
         <InputText type="text" v-model="selectedGenus.family" />
       </div>
-      <!-- 
+      
       <div class="field col-12 md:col-6">
         <label for="Phone">genus</label>
-        <InputText type="text" v-model="selectedGenus.genus" />
+        <Dropdown v-model="currentTaxon.taxonRank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
       </div>
-
-      <div class="field col-12 md:col-12">
-        <label for="phoneext">scientificName</label>
-        <InputText type="text" v-model="selectedGenus.scientificName" />
-      </div> -->
     </div>
-    <!-- <pre>{{ selectedGenus }}</pre> -->
+    <pre>{{ selectedGenus }}</pre>
+   
   </Panel>
 </template>
 <style lang="scss" scoped>
@@ -83,7 +99,9 @@ const searchGenus = (event) => {
     margin-bottom: 0.5rem;
   }
 }
-
+.p-fluid {
+  margin-top: 1 rem;
+}
 .field * {
   display: blcok;
 }

@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@directus/sdk": "^9.11.0",
     "primeicons": "^5.0.0",
     "primevue": "^3.12.6",
     "sass": "^1.52.0",
