@@ -6,7 +6,11 @@ import InputText from 'primevue/inputtext';
 import Panel from 'primevue/panel';
 const genera = ref();
 // const gbifService = ref(new GbifService());
-const selectedGenus = ref();
+const selectedGenus = ref({
+  kingdom: '',
+  phylum: '',
+  family: '',
+});
 
 const searchGenus = (event) => {
   setTimeout(() => {
@@ -57,7 +61,7 @@ const searchGenus = (event) => {
         <label for="date">family</label>
         <InputText type="text" v-model="selectedGenus.family" />
       </div>
-
+      <!-- 
       <div class="field col-12 md:col-6">
         <label for="Phone">genus</label>
         <InputText type="text" v-model="selectedGenus.genus" />
@@ -66,7 +70,7 @@ const searchGenus = (event) => {
       <div class="field col-12 md:col-12">
         <label for="phoneext">scientificName</label>
         <InputText type="text" v-model="selectedGenus.scientificName" />
-      </div>
+      </div> -->
     </div>
     <!-- <pre>{{ selectedGenus }}</pre> -->
   </Panel>
