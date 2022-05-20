@@ -27,18 +27,24 @@ const searchGenus = (event) => {
 <template>
   <Panel header="AutoComplete">
     <div class="p-fluid formgrid grid">
-      <div class="field col-12 md:col-6">
-        <label for="basic">Basic</label>
-        <AutoComplete
-          v-model="selectedGenus"
-          :suggestions="genera"
-          @complete="searchGenus($event)"
-          field="genus"
-        >
-          <template #item="{ item }">
-            <div>{{ item.genus }} ({{ item.kingdom }})</div>
-          </template>
-        </AutoComplete>
+      <div class="field col-12">
+        <div class="p-float-label">
+          <AutoComplete
+            v-model="selectedGenus"
+            :suggestions="genera"
+            @complete="searchGenus($event)"
+            field="genus"
+          >
+            <template #item="{ item }">
+              <div>{{ item.genus }} ({{ item.kingdom }})</div>
+            </template>
+          </AutoComplete>
+          <label
+            for="name"
+            :class="{ 'p-error': v$.name.$invalid && submitted }"
+            >search in GBIF</label
+          >
+        </div>
       </div>
 
       <div class="field col-12 md:col-6">
