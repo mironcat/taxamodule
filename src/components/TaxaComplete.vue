@@ -2,7 +2,7 @@
 import { ref } from "vue";
 // import GbifService from '../services/GbifService';
 import AutoComplete from "primevue/autocomplete";
-import InputText from "primevue/inputtext";
+// import InputText from "primevue/inputtext";
 import Panel from "primevue/panel";
 import Dropdown from "primevue/dropdown";
 const props = defineProps({
@@ -10,6 +10,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  mode:{
+    type: String,
+    required: true
+  }
 });
 const EmptyTaxon = {
   taxonRank:'',
@@ -47,9 +51,43 @@ const searchGenus = (event) => {
 <template>
   <Panel header="Taxa" width="600">
     <!--  -->
+   
     <div class="p-fluid formgrid grid">
+      
+      <div class="field col-12 md:col-10"> 
+         <h5 align="left">scientificName </h5>
+        <InputText type="text" v-model="selectedGenus.scientificName" />
+      </div>
+  
+      <div class="field col-12 md:col-2">
+        <h5 >Rank </h5>    
+         <!-- <label align="left" >Rank</label> -->
+        <Dropdown v-model="selectedGenus.rank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
+      </div>         
+      <div class="field col-12 md:col-4">
+        <h5 align="left">Kingdom</h5>
+        <InputText type="text" v-model="selectedGenus.kingdom" />
+      </div>
+
+      <div class="field col-12 md:col-4">
+        <h5 align="left">Phylum</h5>
+        <InputText type="text" v-model="selectedGenus.phylum" />
+      </div>
+
+      <div class="field col-12 md:col-4">
+        <h5 align="left">Family</h5>
+        <InputText type="text" v-model="selectedGenus.family" disabled />
+      </div>
+      <div class="field col-12 md:col-6">
+        <h5 align="left">Genus</h5>
+        <InputText type="text" v-model="selectedGenus.genus" />
+      </div>
+      <div class="field col-12 md:col-6">
+        <h5 align="left">Canonical name</h5>
+        <InputText type="text" v-model="selectedGenus.canonicalName" />
+      </div>      
       <div class="field col-12">
-        <div class="p-float-label">
+          <h5>GBIF search</h5>        
           <AutoComplete
             v-model="selectedGenus"
             :suggestions="taxa"
@@ -60,35 +98,10 @@ const searchGenus = (event) => {
               <div>{{ item.scientificName }} ({{ item.kingdom }})</div>
             </template>
           </AutoComplete>
-          <label>GBIF search</label>
-        </div>
-      </div>
-      <div class="field col-12 md:col-10">
-        <label for="phoneext">scientificName</label>
-        <InputText type="text" v-model="selectedGenus.scientificName" />
-      </div>
-      <div class="field col-12 md:col-2">
-         <label for="phoneext">Rank</label>
-        <Dropdown v-model="selectedGenus.rank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
-      </div>         
-      <div class="field col-12 md:col-6">
-        <label>Kingdom</label>
-        <InputText type="text" v-model="selectedGenus.kingdom" />
-      </div>
-
-      <div class="field col-12 md:col-6">
-        <label for="ssn">phylum</label>
-        <InputText type="text" v-model="selectedGenus.phylum" />
-      </div>
-
-      <div class="field col-12 md:col-6">
-        <label for="date">family</label>
-        <InputText type="text" v-model="selectedGenus.family" />
-      </div>
-      
+      </div>      
 
     </div>
-    <pre>{{ selectedGenus }}</pre>
+    <pre>{{ sourceTaxon }}</pre>
    
   </Panel>
 </template>
@@ -96,12 +109,13 @@ const searchGenus = (event) => {
 .sizes {
   .p-inputtext {
     display: block;
-    margin-bottom: 0.5rem;
+    // margin-bottom: 0.5rem;
   }
 }
-.p-fluid {
-  margin-top: 1rem;
-}
+// .p-fluid {
+//   margin-top: 1rem;
+// }
+h5 { margin-bottom: 0.5rem; margin-top: 0.5rem; }
 .field * {
   display: blcok;
 }
