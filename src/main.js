@@ -1,10 +1,18 @@
 import { createApp } from 'vue'
+import { createWebHistory } from 'vue-router'
+import createRouter from './routes'
 import App from './App.vue'
 import PrimeVue from 'primevue/config';
-import InputText from "primevue/inputtext";
-import Button from 'primevue/button';
+// import InputText from "primevue/inputtext";
+// import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
 const app = createApp(App);
-app.use(PrimeVue).mount('#app');
+const router = createRouter(createWebHistory());
 app
-    .component('InputText', InputText)
-    .component('Button', Button);
+    .component('DataTable', DataTable)
+    .component('Column', Column);
+
+app.use(router).use(PrimeVue).mount('#app');
+

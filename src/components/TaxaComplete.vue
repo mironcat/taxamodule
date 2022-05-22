@@ -2,9 +2,11 @@
 import { ref } from "vue";
 // import GbifService from '../services/GbifService';
 import AutoComplete from "primevue/autocomplete";
-// import InputText from "primevue/inputtext";
+import InputText from "primevue/inputtext";
 import Panel from "primevue/panel";
 import Dropdown from "primevue/dropdown";
+import Button from 'primevue/button';
+import Toolbar from 'primevue/Toolbar';
 const props = defineProps({
   sourceTaxon: {
     type: Object,
@@ -49,9 +51,15 @@ const searchGenus = (event) => {
 </script>
 
 <template>
-  <Panel header="Taxa" width="600">
-    <!--  -->
-   
+  <Panel header="Taxa">
+
+      <!-- <Toolbar> -->
+          <template #icons>
+                <Button align="end" label="edit" class="mr-2" />
+                <Button align="right" label="new" class="p-button-success" />
+          </template>
+      <!-- </Toolbar>       -->
+
     <div class="p-fluid formgrid grid">
       
       <div class="field col-12 md:col-10"> 
