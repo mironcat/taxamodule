@@ -1,20 +1,20 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 // import GbifService from '../services/GbifService';
+import { DirectusItem } from "../services/PaleobotService";
 import AutoComplete from "primevue/autocomplete";
-import InputText from "primevue/inputtext";
 import Panel from "primevue/panel";
 import Dropdown from "primevue/dropdown";
-import Button from 'primevue/button';
 import Toolbar from 'primevue/Toolbar';
 const props = defineProps({
-  sourceTaxon: {
-    type: Object,
-    required: true,
+  id: {
+    type: Number,
+    default:1
   },
   mode:{
     type: String,
-    required: true
+    required: true,
+    default:'view'
   }
 });
 const EmptyTaxon = {
@@ -25,23 +25,33 @@ const EmptyTaxon = {
   family: "",
   scientificName: "",  
 };
+console.log(props.id);
+const itemParams = { table:'taxa', emptyfields: EmptyTaxon }
+const taxonItem = new DirectusItem(itemParams);
+// taxonItem.getByID(1);
+const currentTaxon =  ref(EmptyTaxon);
+
+onMounted(async () => {
+  console.log(props.id)
+  currentTaxon.value=await taxonItem.getByID((props.id));
+});
 const TaxonRanking =ref([
             {name: 'SPECIES', code: 'SPECIES'},
             {name: 'GENUS', code: 'GENUS'},
             {name: 'FAMILY', code: 'FAMILY'},
             {name: 'ORDER', code: 'ORDER'}
         ]);
-const taxa = ref();
+const listOfGbifTaxa = ref();
 // const gbifService = ref(new GbifService());
-const currentTaxon = ref(EmptyTaxon)
-const selectedGenus = ref(EmptyTaxon);
+
+const selectedGbifTaxon = ref(EmptyTaxon);
 
 const searchGenus = (event) => {
   setTimeout(() => {
     if (event.query.trim().length) {
       fetch(`//api.gbif.org/v1/species/suggest?q=${event.query.trim()}`)
         .then((res) => res.json())
-        .then((d) => (taxa.value = d));
+        .then((d) => (listOfGbifTaxa.value = d));
       // gbifService.value
       //   .getGenusNames(event.query.toLowerCase())
       //   .then((data) => (genera.value = data));
@@ -53,52 +63,48 @@ const searchGenus = (event) => {
 <template>
   <Panel header="Taxa">
 
-      <!-- <Toolbar> -->
           <template #icons>
                 <Button align="end" label="edit" class="mr-2" />
                 <Button align="right" label="new" class="p-button-success" />
           </template>
-      <!-- </Toolbar>       -->
-
     <div class="p-fluid formgrid grid">
       
       <div class="field col-12 md:col-10"> 
          <h5 align="left">scientificName </h5>
-        <InputText type="text" v-model="selectedGenus.scientificName" />
+        <InputText type="text" v-model="currentTaxon.scientificName" />
       </div>
   
       <div class="field col-12 md:col-2">
         <h5 >Rank </h5>    
-         <!-- <label align="left" >Rank</label> -->
-        <Dropdown v-model="selectedGenus.rank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
+        <Dropdown v-model="currentTaxon.taxonRank" :options="TaxonRanking" optionLabel="name" optionValue="code" placeholder="Taxon rank" />
       </div>         
       <div class="field col-12 md:col-4">
         <h5 align="left">Kingdom</h5>
-        <InputText type="text" v-model="selectedGenus.kingdom" />
+        <InputText type="text" v-model="currentTaxon.kingdom" />
       </div>
 
       <div class="field col-12 md:col-4">
         <h5 align="left">Phylum</h5>
-        <InputText type="text" v-model="selectedGenus.phylum" />
+        <InputText type="text" v-model="currentTaxon.phylum" />
       </div>
 
       <div class="field col-12 md:col-4">
         <h5 align="left">Family</h5>
-        <InputText type="text" v-model="selectedGenus.family" disabled />
+        <InputText type="text" v-model="currentTaxon.family"  />
       </div>
       <div class="field col-12 md:col-6">
         <h5 align="left">Genus</h5>
-        <InputText type="text" v-model="selectedGenus.genus" />
+        <InputText type="text" v-model="currentTaxon.genus" />
       </div>
       <div class="field col-12 md:col-6">
         <h5 align="left">Canonical name</h5>
-        <InputText type="text" v-model="selectedGenus.canonicalName" />
+        <InputText type="text" v-model="currentTaxon.canonicalName" />
       </div>      
       <div class="field col-12">
-          <h5>GBIF search</h5>        
+          <h5>GBIF search tool</h5>        
           <AutoComplete
-            v-model="selectedGenus"
-            :suggestions="taxa"
+            v-model="selectedGbifTaxon"
+            :suggestions="listOfGbifTaxa"
             @complete="searchGenus($event)"
             field="scientificName"
           >
@@ -109,7 +115,7 @@ const searchGenus = (event) => {
       </div>      
 
     </div>
-    <pre>{{ sourceTaxon }}</pre>
+    <pre>{{ selectedGbifTaxon }}</pre>
    
   </Panel>
 </template>
