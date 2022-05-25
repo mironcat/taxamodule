@@ -40,7 +40,7 @@ export default {
 <template>
     <div>
         <pre>{{ taxonItem.item }}</pre>
-        <TaxaComplete :id="1" mode="view" />
+        <TaxaComplete id="1" mode="view" />
             <DataTable :value="taxonList" responsiveLayout="scroll">
                 <Column field="scientificName" header="scientificName"></Column>
                 <Column field="taxonomicStatus" header="taxonomicStatus"></Column>

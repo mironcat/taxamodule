@@ -1,5 +1,6 @@
 <script setup>
 import Dropdown from 'primevue/dropdown';
+import Textarea from 'primevue/textarea';
 const props = defineProps({
   currentTaxon: {
     type: Object,
@@ -67,13 +68,10 @@ const TaxonRanking = [
       <h5>Family</h5>
       <InputText type="text" v-model="currentTaxon.family" />
     </div>
-
     <div class="field col-12">
-      <h5>GBIF search tool</h5>
-      <!-- autocomplete -->
-      <slot></slot>
-      <!--   -------  -->
-    </div>
+      <h5>Remarks</h5>
+      <Textarea v-model="currentTaxon.taxonRemarks" rows="5" cols="30" />
+    </div>    
   </div>
 </template>
 <style lang="scss" scoped>

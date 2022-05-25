@@ -21,10 +21,9 @@ watchEffect(async () => {
 
 </script>
 <template>
-  <TaxaComplete :sourceTaxon="sourceTaxon" mode="view" />
-  <p>
-    <Button label="new" />
-    <Button label="edit" @click="getTaxonByID(2)" />
-  </p>
+<ul>
+    <li> <router-link to="/taxa">List of taxa</router-link> </li>
+    <li> <router-link to="/taxa">Taxon 1</router-link> </li>
+</ul>
   <pre>{{ sourceTaxon }}</pre>    
 </template>
