@@ -5,6 +5,8 @@ import AutoComplete from "primevue/autocomplete";
 import Panel from "primevue/panel";
 import TaxonFields from "./TaxonFields.vue";
 import Checkbox from "primevue/checkbox";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
 const props = defineProps({
   id: {
@@ -50,11 +52,28 @@ onMounted(async () => {
 const listOfGbifTaxa = ref();
 // const gbifService = ref(new GbifService());
 const selectedGbifTaxon = ref(EmptyTaxon);
+const showSavedMessage = () => {
+            toast.add({severity:'success', summary: 'Item created and saved', life: 3000});
+    }
 const saveToDB = () => {
+ 
   taxonItem.item =  currentTaxon.value;
-  debugger;
-  taxonItem.saveToDB().then((t) => (currentTaxon.value = t));
+  if(!taxonItem.auth){
+      taxonItem.authStatic().then((t) => {
+            taxonItem.saveToDB().then((res) => {
+              currentTaxon.value = res
+              savedTaxon.value = Object.assign({}, res);
+            });
+             showSavedMessage();    
+        });
+  } else {
+    taxonItem.saveToDB().then((t) => (currentTaxon.value = t));
+     showSavedMessage();
+  }
+
 }
+
+
 const searchTaxon = (taxname) => {
   // setTimeout(() => {
   if (taxname.trim().length) {
@@ -87,20 +106,20 @@ const gbifTaxon = computed(() => {
     canonicalName,
   } = selectedGbifTaxon.value;
   return {
-    gbifkey: key,
+    canonicalName,
     taxonRank: rank,
     scientificName,
-    canonicalName,
     genus,
     family,
     phylum,
     kingdom,
+    gbifkey: key,
   };
 });
 </script>
 
 <template>
-
+    <Toast />
     <div class="grid">
       <div class="col-8">
         <Panel header="Taxa">
@@ -108,7 +127,7 @@ const gbifTaxon = computed(() => {
             <span class="mx-2" v-show="currentTaxon.id">ID:{{currentTaxon.id}}</span>
             <span class="mx-2" v-show="currentTaxon.gbifkey">GBIF ID:{{currentTaxon.gbifkey}}</span>
             <Button  v-show="!currentTaxon.id" align="right" label="SAVE TO DB" class="mr-2  p-button-success" @click="saveToDB()" />
-            <Button  v-show="currentTaxon.id" align="end" label="UPDATE" class="mr-2"   />
+            <Button  v-show="currentTaxon.id" align="end" label="UPDATE" class="mr-2"  @click="showSavedMessage()" />
             <Button align="right" label="DISCARD" class="p-button-secondary" @click="currentTaxon = Object.assign({}, savedTaxon)"/>
           </template>
      
@@ -128,7 +147,7 @@ const gbifTaxon = computed(() => {
                 :minLength="2"
                 :suggestions="listOfGbifTaxa"
                 @complete="searchTaxon($event.query)"
-                field="scientificName"
+                field="canonicalName"
                 key="key"
               >
                 <template #item="{ item }">
@@ -153,7 +172,7 @@ const gbifTaxon = computed(() => {
                     @click="currentTaxon[fieldName] = value"
                     :label="currentTaxon[fieldName] + '<-' + value"
                     class="p-button-text p-button-secondary p-button-sm"
-                  ><i  v-if="currentTaxon[fieldName]!=value" class="pi pi-arrow-left mx-2"/> {{value}}  <i v-if="currentTaxon[fieldName]==value" class="pi pi-check mx-2"/> 
+                  ><span  v-if="currentTaxon[fieldName]!=value" >{{currentTaxon[fieldName]}}<i  class="pi pi-arrow-left mx-2"/></span> {{value}}  <i v-if="currentTaxon[fieldName]==value" class="pi pi-check mx-2"/> 
                   </Button>
                 </div>
               </div>

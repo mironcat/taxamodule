@@ -1,6 +1,9 @@
 import { Directus } from '@directus/sdk';
 const directus = new Directus('https://paleobot.mironcat.tk');
 // 
+export class Authentication {
+
+}
 export class DirectusItem {
     constructor({table = 'taxa', emptyfields ={
         taxonRank:'',
@@ -14,15 +17,13 @@ export class DirectusItem {
         this.item={};
         this.itemspromise=directus.items(table);
         this.emptyfields=emptyfields;
+        this.auth=false;
     }
-    async auth(user, login){
-        await this.itemspromise.auth.login({
-            email: '',
-            password: '',
-        });
+    async authStatic(user, login){
+        return await directus.auth.static('dev_token123456').then((res) => (this.auth = res));
     }
     async getByID(id){
-         return await this.itemspromise.readOne(id).then((t) => (this.item = t));
+         return await this.itemspromise.readOne(id).then((t) => this.item = t);
      }
     newEmpty(){
         this.item=this.emptyfields;
@@ -36,6 +37,10 @@ export class DirectusItem {
     }
     
 }
+export class Taxon extends DirectusItem {
+
+}
+
 const taxa = directus.items("taxa");
 export class PaleobotService {
     
