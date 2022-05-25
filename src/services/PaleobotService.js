@@ -8,11 +8,18 @@ export class DirectusItem {
         kingdom: "",
         phylum: "",
         family: "",
-        scientificName: "",  
+        scientificName: "",
+        gbifkey: null, 
       }}) {
         this.item={};
         this.itemspromise=directus.items(table);
         this.emptyfields=emptyfields;
+    }
+    async auth(user, login){
+        await this.itemspromise.auth.login({
+            email: '',
+            password: '',
+        });
     }
     async getByID(id){
          return await this.itemspromise.readOne(id).then((t) => (this.item = t));
@@ -20,8 +27,8 @@ export class DirectusItem {
     newEmpty(){
         this.item=this.emptyfields;
     }
-    async createAndSave(){
-        await this.itemspromise.createOne(this.item).then((t) => (this.item = t));
+    async saveToDB(){
+       return await this.itemspromise.createOne(this.item);
     }
 
     async updateOne(){

@@ -32,24 +32,29 @@ const itemParams = { table: "taxa", emptyfields: EmptyTaxon };
 const taxonItem = new DirectusItem(itemParams);
 // taxonItem.getByID(1);
 const currentTaxon = ref(EmptyTaxon);
-const savedTaxon = ref(EmptyTaxon);
+const savedTaxon = ref(Object.assign({}, EmptyTaxon));
 
 
 onMounted(async () => {
   if (props.mode == "view") {
       const res = await taxonItem.getByID(props.id);
       currentTaxon.value = res;
-      savedTaxon.value = res;
+      savedTaxon.value = Object.assign({}, res);
+      // Object.freeze(savedTaxon.value);
   }
     
 });
-const currentTaxonChanged =  computed(() => {
-  return savedTaxon.value == currentTaxon.value ? true: false;
-});
+// const currentTaxonChanged =  computed(() => {
+//   return savedTaxon.value == currentTaxon.value ? true: false;
+// });
 const listOfGbifTaxa = ref();
 // const gbifService = ref(new GbifService());
 const selectedGbifTaxon = ref(EmptyTaxon);
-
+const saveToDB = () => {
+  taxonItem.item =  currentTaxon.value;
+  debugger;
+  taxonItem.saveToDB().then((t) => (currentTaxon.value = t));
+}
 const searchTaxon = (taxname) => {
   // setTimeout(() => {
   if (taxname.trim().length) {
@@ -60,7 +65,6 @@ const searchTaxon = (taxname) => {
   // }, 250);
 };
 const searchAutoTaxon = (taxname) => {
-  setTimeout(() => {
     if (taxname.trim().length) {
       fetch(`//api.gbif.org/v1/species/suggest?q=${taxname.trim()}`)
         .then((res) => res.json())
@@ -69,7 +73,6 @@ const searchAutoTaxon = (taxname) => {
           selectedGbifTaxon.value = d[0];
         });
     }
-  }, 250);
 };
 
 const gbifTaxon = computed(() => {
@@ -94,25 +97,27 @@ const gbifTaxon = computed(() => {
     kingdom,
   };
 });
-const selectedGbifFields = ref(Object.keys(EmptyTaxon));
 </script>
 
 <template>
-  <Panel header="Taxa">
-    <template #icons>
-    
-      <Button align="right" label="NEW" class="mr-2  p-button-success" />
-      <Button align="end" label="SAVE" class="mr-2" />
-      <Button align="right" label="DISCARD" class="p-button-secondary" @click="currentTaxon = savedTaxon"/>
-    </template>
-      {{savedTaxon}}
+
     <div class="grid">
       <div class="col-8">
-        <TaxonFields
-          :currentTaxon="currentTaxon"
-          @search-taxon="(g) => searchAutoTaxon(g)"
-        >
-        </TaxonFields>
+        <Panel header="Taxa">
+          <template #icons>
+            <span class="mx-2" v-show="currentTaxon.id">ID:{{currentTaxon.id}}</span>
+            <span class="mx-2" v-show="currentTaxon.gbifkey">GBIF ID:{{currentTaxon.gbifkey}}</span>
+            <Button  v-show="!currentTaxon.id" align="right" label="SAVE TO DB" class="mr-2  p-button-success" @click="saveToDB()" />
+            <Button  v-show="currentTaxon.id" align="end" label="UPDATE" class="mr-2"   />
+            <Button align="right" label="DISCARD" class="p-button-secondary" @click="currentTaxon = Object.assign({}, savedTaxon)"/>
+          </template>
+     
+              <TaxonFields
+                :currentTaxon="currentTaxon"
+                @search-taxon="(g) => searchAutoTaxon(g)"
+              >
+              </TaxonFields>
+        </Panel>
       </div>
       <div class="col-4">
         <Panel header="GBIF search tool">
@@ -134,6 +139,24 @@ const selectedGbifFields = ref(Object.keys(EmptyTaxon));
 
 
           <div v-show="gbifTaxon.gbifkey" align="left">
+
+                <div
+                  v-for="(value, fieldName) in gbifTaxon"
+                  :key="fieldName"
+                  style="text-align: left"
+                >
+                 <label class="taxfields" :for="fieldName"
+                    ><strong>{{ fieldName }}</strong
+                    >:</label
+                  >
+                  <Button
+                    @click="currentTaxon[fieldName] = value"
+                    :label="currentTaxon[fieldName] + '<-' + value"
+                    class="p-button-text p-button-secondary p-button-sm"
+                  ><i  v-if="currentTaxon[fieldName]!=value" class="pi pi-arrow-left mx-2"/> {{value}}  <i v-if="currentTaxon[fieldName]==value" class="pi pi-check mx-2"/> 
+                  </Button>
+                </div>
+              </div>
           <Button
               v-show="gbifTaxon.gbifkey"
               @click="currentTaxon = gbifTaxon"
@@ -149,30 +172,15 @@ const selectedGbifFields = ref(Object.keys(EmptyTaxon));
               "
               label="Apply higher clades"
               class="p-button-raised p-button-text p-button-success"
-            />    
-
-                <div
-                  v-for="(value, fieldName) in gbifTaxon"
-                  :key="fieldName"
-                  style="text-align: left"
-                >
-                 <label class="taxfields" :for="fieldName"
-                    ><strong>{{ fieldName }}</strong
-                    >:</label
-                  >
-                  <Button
-                    @click="currentTaxon[fieldName] = value"
-                    :label="currentTaxon[fieldName] + '<-' + value"
-                    class="p-button-text p-button-secondary p-button-sm"
-                  />
-                </div>
-              </div>
-        </Panel>
+            />                 
+           </Panel>
       </div>
     </div>
-  </Panel>
+
 <h3>currentTaxon</h3>
   <pre>{{ currentTaxon }}</pre>
+<h3>savedTaxon</h3>
+  <pre>{{ savedTaxon }}</pre>  
 </template>
 
 <style lang="scss" scoped>
