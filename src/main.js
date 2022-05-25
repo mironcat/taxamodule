@@ -9,11 +9,12 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 const app = createApp(App);
 const router = createRouter(createWebHistory());
+app.use(PrimeVue)
 app
     .component('DataTable', DataTable)
     .component('Column', Column)
     .component('Button', Button)
     .component('InputText', InputText);
 
-app.use(router).use(PrimeVue).mount('#app');
+app.use(router).mount('#app');
 

@@ -34,29 +34,36 @@ const currentTaxon = ref(EmptyTaxon);
 const checked  = ref(false);
 
 onMounted(async () => {
-  console.log(props.id);
-  currentTaxon.value = await taxonItem.getByID(props.id);
+  if (props.mode == 'view') currentTaxon.value = await taxonItem.getByID(props.id);
 });
 
 
 const listOfGbifTaxa = ref();
 // const gbifService = ref(new GbifService());
-
 const selectedGbifTaxon = ref(EmptyTaxon);
 
-
-const searchGenus = (event) => {
-  setTimeout(() => {
-    if (event.query.trim().length) {
-      fetch(`//api.gbif.org/v1/species/suggest?q=${event.query.trim()}`)
+const searchTaxon = (taxname) => {
+  // setTimeout(() => {
+    if (taxname.trim().length) {
+      fetch(`//api.gbif.org/v1/species/suggest?q=${taxname.trim()}`)
         .then((res) => res.json())
         .then((d) => (listOfGbifTaxa.value = d));
-      // gbifService.value
-      //   .getGenusNames(event.query.toLowerCase())
-      //   .then((data) => (genera.value = data));
+    }
+  // }, 250);
+};
+const searchAutoTaxon = (taxname) => {
+  setTimeout(() => {
+    if (taxname.trim().length) {
+      fetch(`//api.gbif.org/v1/species/suggest?q=${taxname.trim()}`)
+        .then((res) => res.json())
+        .then((d) =>{
+          listOfGbifTaxa.value = d;
+          selectedGbifTaxon.value=d[0];
+        } );
     }
   }, 250);
 };
+
 const gbifTaxon = computed(() => {
   const { key, rank, genus, family, phylum, kingdom, scientificName, canonicalName } =  selectedGbifTaxon.value;
   return { gbifkey:key, taxonRank:rank, scientificName, canonicalName, genus, family, phylum, kingdom,  }
@@ -71,39 +78,46 @@ const selectedGbifFields = ref(Object.keys(EmptyTaxon));
       <Button align="end" label="edit" class="mr-2" />
       <Button align="right" label="new" class="p-button-success" />
     </template>
-    <TaxonFields :currentTaxon=currentTaxon> 
+    <TaxonFields :currentTaxon=currentTaxon
+                  @search-taxon="(g) => searchAutoTaxon(g)"
+                > 
           <AutoComplete
             v-model="selectedGbifTaxon"
+            :delay="1000"
+            :minLength="2"
             :suggestions="listOfGbifTaxa"
-            @complete="searchGenus($event)"
+            @complete="searchTaxon($event.query)"
             field="scientificName"
-          >
+            key="key"
+            inputClass="p-invalid"
+         >
             <template #item="{ item }">
               <div>{{ item.scientificName }} ({{ item.kingdom }})</div>
             </template>
           </AutoComplete>
-    </TaxonFields>    
-    <h5 align="left">Info about taxa from GBIF database </h5>
-    <div v-for="(value, fieldName) in gbifTaxon" :key="fieldName" class="field-checkbox">
+    </TaxonFields> 
+    <div v-show="gbifTaxon.gbifkey">   
+      <div align="left">
+        <Button @click="currentTaxon = gbifTaxon" label="Apply all" class="p-button-raised p-button-text p-button-success mr-2" />
+        <Button @click="currentTaxon.kingdom=gbifTaxon.kingdom; currentTaxon.phylum=gbifTaxon.phylum; currentTaxon.family=gbifTaxon.family;" label="Apply higher taxonomy only" class="p-button-raised p-button-text p-button-success" />    
+      </div>
+      <div v-for="(value, fieldName) in gbifTaxon" :key="fieldName" style="text-align:left">
           <!-- <li>{{fieldName}}- {{value}} </li> -->
-        <Checkbox :id="fieldName" name="field" :value="fieldName" v-model="selectedGbifFields" />
-        <label :for="fieldName">{{fieldName}}: {{value}}</label> 
+        <!-- <Checkbox :id="fieldName" name="field" :value="fieldName" v-model="selectedGbifFields" /> -->
+        <label :for="fieldName"><strong>{{fieldName}}</strong>: {{value}}
+                <Button  @click="currentTaxon[fieldName]=value" label="^" class="p-button-text p-button-secondary" />
+        </label> 
+
+         <!-- <Button @click="currentTaxon[fieldName]=value" icon="pi pi-plus" class="p-button-rounded p-button-text" /> -->
+      </div>
+
     </div>
-    <pre>{{ selectedGbifTaxon }}</pre>
+        <!-- <pre>{{ listOfGbifTaxa }}</pre> -->
   </Panel>
 </template>
+
 <style lang="scss" scoped>
-.sizes {
-  .p-inputtext {
-    display: block;
-    // margin-bottom: 0.5rem;
-  }
-}
-h5 {
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
-}
-.field * {
-  display: blcok;
+.p-inputtext.p-invalid.p-component {
+    
 }
 </style>
