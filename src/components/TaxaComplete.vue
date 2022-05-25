@@ -118,6 +118,6 @@ const selectedGbifFields = ref(Object.keys(EmptyTaxon));
 
 <style lang="scss" scoped>
 .p-inputtext.p-invalid.p-component {
-    
+    border-color: #35dc6d;
 }
 </style>
