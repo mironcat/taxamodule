@@ -1,44 +1,62 @@
 import { Directus } from '@directus/sdk';
+import { ref } from "vue";
 const directus = new Directus('https://paleobot.mironcat.tk');
 // 
 export class Authentication {
 
 }
 export class DirectusItem {
-    constructor({table = 'taxa', emptyfields ={
-        taxonRank:'',
-        genus: "",
-        kingdom: "",
-        phylum: "",
-        family: "",
-        scientificName: "",
-        gbifkey: null, 
-      }}) {
-        this.item={};
+    constructor({table, emptyfields}) {
         this.itemspromise=directus.items(table);
+        this.currentItem=ref(emptyfields);
+        this.previousItem=ref(emptyfields);
+        this.authenticated=false;
         this.emptyfields=emptyfields;
-        this.auth=false;
     }
-    async authStatic(user, login){
-        return await directus.auth.static('dev_token123456').then((res) => (this.auth = res));
+    updateItem(value){
+        this.currentItem.value = Object.assign({}, value);
+        this.previousItem.value = Object.assign({}, value);
+    }
+    async authStatic(){
+        this.authenticated = this.authenticated ? true : await directus.auth.static('dev_token123456');
     }
     async getByID(id){
-         return await this.itemspromise.readOne(id).then((t) => this.item = t);
+        const res = await this.itemspromise.readOne(id);
+        this.updateItem(res);
      }
     newEmpty(){
         this.item=this.emptyfields;
     }
     async saveToDB(){
-       return await this.itemspromise.createOne(this.item);
+        const status = false;
+        const res =  await this.itemspromise.createOne(this.currentItem).then(() => this.status = true );
+        this.updateItem(res);
+        return status;
     }
 
     async updateOne(){
-        await this.itemspromise.updateOne(this.item.id);
+        const status = false;
+        const id = this.currentItem.value.id;
+        const value = this.currentItem.value
+        const res =  await this.itemspromise.updateOne(id, value);
+        return res;
     }
     
 }
 export class Taxon extends DirectusItem {
-
+    constructor() {
+        const emptyfields = {
+            canonicalName: "test",            
+            taxonRank: "",
+            scientificName: "",            
+            genus: "",
+            kingdom: "",
+            phylum: "",
+            family: "",
+            gbifkey: null,
+          };
+        super({table: 'taxa', emptyfields });
+    }
 }
 
 const taxa = directus.items("taxa");

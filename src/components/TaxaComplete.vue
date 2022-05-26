@@ -1,13 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { DirectusItem } from "../services/PaleobotService";
+import { Taxon } from "../services/PaleobotService";
 import AutoComplete from "primevue/autocomplete";
 import Panel from "primevue/panel";
 import TaxonFields from "./TaxonFields.vue";
-import Checkbox from "primevue/checkbox";
 import { useToast } from "primevue/usetoast";
-const toast = useToast();
 
+const toast = useToast();
 const props = defineProps({
   id: {
     type: String,
@@ -19,60 +18,31 @@ const props = defineProps({
     default: "view",
   },
 });
-const EmptyTaxon = {
-  taxonRank: "",
-  genus: "",
-  kingdom: "",
-  phylum: "",
-  family: "",
-  scientificName: "",
-  canonicalName: "",
-  gbifkey: null,
-};
-console.log(props.id);
-const itemParams = { table: "taxa", emptyfields: EmptyTaxon };
-const taxonItem = new DirectusItem(itemParams);
-// taxonItem.getByID(1);
-const currentTaxon = ref(EmptyTaxon);
-const savedTaxon = ref(Object.assign({}, EmptyTaxon));
+
+const taxonItem = new Taxon();
+if ( !taxonItem.authenticated ) taxonItem.authStatic(); // !!
+const currentTaxon = taxonItem.currentItem;
+const savedTaxon = taxonItem.previousItem;
+
+// --------- GBIF tool ----------------------------------------------------------------
+const listOfGbifTaxa = ref();
+const selectedGbifTaxon = ref(taxonItem.emptyfields);
 
 
 onMounted(async () => {
-  if (props.mode == "view") {
-      const res = await taxonItem.getByID(props.id);
-      currentTaxon.value = res;
-      savedTaxon.value = Object.assign({}, res);
-      // Object.freeze(savedTaxon.value);
-  }
-    
+  if (props.mode == "view")  taxonItem.getByID(props.id);
 });
-// const currentTaxonChanged =  computed(() => {
-//   return savedTaxon.value == currentTaxon.value ? true: false;
-// });
-const listOfGbifTaxa = ref();
-// const gbifService = ref(new GbifService());
-const selectedGbifTaxon = ref(EmptyTaxon);
+
 const showSavedMessage = () => {
             toast.add({severity:'success', summary: 'Item created and saved', life: 3000});
     }
 const saveToDB = () => {
- 
-  taxonItem.item =  currentTaxon.value;
-  if(!taxonItem.auth){
-      taxonItem.authStatic().then((t) => {
-            taxonItem.saveToDB().then((res) => {
-              currentTaxon.value = res
-              savedTaxon.value = Object.assign({}, res);
-            });
-             showSavedMessage();    
-        });
-  } else {
-    taxonItem.saveToDB().then((t) => (currentTaxon.value = t));
-     showSavedMessage();
-  }
-
+  const saveStatus=taxonItem.saveToDB()
+ if (saveStatus) toast.add({severity:'success', summary: 'Item created and saved', life: 3000});
 }
-
+const updateOne = () => {
+ if (taxonItem.updateOne()) toast.add({severity:'success', summary: 'Item updated', life: 3000});
+}
 
 const searchTaxon = (taxname) => {
   // setTimeout(() => {
@@ -127,7 +97,7 @@ const gbifTaxon = computed(() => {
             <span class="mx-2" v-show="currentTaxon.id">ID:{{currentTaxon.id}}</span>
             <span class="mx-2" v-show="currentTaxon.gbifkey">GBIF ID:{{currentTaxon.gbifkey}}</span>
             <Button  v-show="!currentTaxon.id" align="right" label="SAVE TO DB" class="mr-2  p-button-success" @click="saveToDB()" />
-            <Button  v-show="currentTaxon.id" align="end" label="UPDATE" class="mr-2"  @click="showSavedMessage()" />
+            <Button  v-show="currentTaxon.id" align="end" label="UPDATE" class="mr-2"  @click="updateOne()" />
             <Button align="right" label="DISCARD" class="p-button-secondary" @click="currentTaxon = Object.assign({}, savedTaxon)"/>
           </template>
      
@@ -196,10 +166,10 @@ const gbifTaxon = computed(() => {
       </div>
     </div>
 
-<h3>currentTaxon</h3>
-  <pre>{{ currentTaxon }}</pre>
-<h3>savedTaxon</h3>
-  <pre>{{ savedTaxon }}</pre>  
+<h3>taxonItem.currentItem</h3>
+  <pre>{{ taxonItem.currentItem }}</pre>
+<h3>previousItem</h3>
+  <pre>{{ taxonItem.previousItem }}</pre>  
 </template>
 
 <style lang="scss" scoped>
