@@ -23,7 +23,7 @@ watchEffect(async () => {
 <template>
 <ul>
     <li> <router-link to="/taxa">List of taxa</router-link> </li>
-    <li> <router-link to="/taxa">Taxon 1</router-link> </li>
+    <li> <router-link to="/taxa/1">Taxon 1</router-link> </li>
 </ul>
   <pre>{{ sourceTaxon }}</pre>    
 </template>

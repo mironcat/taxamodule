@@ -45,7 +45,7 @@ const TaxonRanking = [
 
     <div class="field col-12 md:col-4">
       <h5>Genus</h5>
-      <div class="p-inputgroup">
+      <div class="p-inputgroup border-cyan-500">
         <InputText type="text" v-model="currentTaxon.genus" />
         <Button
           class="p-button-outlined p-button-success"
